@@ -132,16 +132,19 @@ class XmlItemExporter(BaseItemExporter):
         self.xg.endElement(self.root_element)
         self.xg.endDocument()
 
-    def _export_xml_field(self, name, serialized_value):
-        self.xg.startElement(name, {})
-        if hasattr(serialized_value, '__iter__'):
-            for value in serialized_value:
-                self._export_xml_field('value', value)
-        else:
-            self.xg.characters(serialized_value)
-        self.xg.endElement(name)
-
-
+    def _export_xml_field(self, name, serialized_value): 
+        self.xg.startElement(name, {}) 
+        if hasattr(serialized_value, '__iter__'): 
+            if type(serialized_value) == dict: 
+                for key, value in serialized_value.iteritems(): 
+                    self._export_xml_field(key, value) 
+                else: 
+                    for value in serialized_value: 
+                        self._export_xml_field('value', value) 
+            else: 
+                self.xg.characters(serialized_value) 
+        self.xg.endElement(name) 
+        
 class CsvItemExporter(BaseItemExporter):
 
     def __init__(self, file, include_headers_line=True, join_multivalued=',', **kwargs):
